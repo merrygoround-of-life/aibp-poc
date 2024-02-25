@@ -1,9 +1,13 @@
 from executor.core.chain_agent import *
-from executor.core.functioncall_agent import *
-from executor.custom.cat_facts_agent import *
-from executor.custom.get_current_time_agent import *
+from executor.custom.animal_info_router_agent import *
+from executor.custom.asr_to_prompt_agent import *
+from executor.custom.cat_facts_api_agent import *
+from executor.custom.current_location_agent import *
+from executor.custom.current_time_agent import *
+from executor.custom.dog_facts_api_agent import *
 from executor.custom.get_user_profile_agent import *
-from executor.custom.get_location_agent import *
+from executor.custom.response_to_asr_agent import *
+from executor.custom.router_agent import *
 
 
 def from_chain_dict(json_dict: dict):
@@ -13,7 +17,7 @@ def from_chain_dict(json_dict: dict):
         chain_agents.append(from_dict(sub_agent_dict))
 
     config_klass = globals()[json_dict["config"]["class"]]
-    return klass(config=config_klass(**json_dict["config"]), name=json_dict["name"], chain_agents=chain_agents)
+    return klass(config=config_klass(**json_dict["config"]), uuid=json_dict["uuid"], chain_agents=chain_agents)
 
 
 def from_tool_dict(json_dict: dict):
@@ -23,7 +27,7 @@ def from_tool_dict(json_dict: dict):
         tool_agents.append(from_dict(sub_agent_dict))
 
     config_klass = globals()[json_dict["config"]["class"]]
-    return klass(config=config_klass(**json_dict["config"]), name=json_dict["name"], tool_agents=tool_agents)
+    return klass(config=config_klass(**json_dict["config"]), uuid=json_dict["uuid"], tool_agents=tool_agents)
 
 
 def from_dict(json_dict: dict):
@@ -34,4 +38,4 @@ def from_dict(json_dict: dict):
         return from_tool_dict(json_dict)
 
     config_klass = globals()[json_dict["config"]["class"]]
-    return klass(config=config_klass(**json_dict["config"]), name=json_dict["name"])
+    return klass(config=config_klass(**json_dict["config"]), uuid=json_dict["uuid"])

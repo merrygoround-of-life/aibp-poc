@@ -9,15 +9,17 @@ class AgentManager:
     def __init__(self):
         self.db: dict[str, str] = {}
 
-    def _set(self, agent: Agent):
-        self.db[agent.name] = json.dumps(to_dict(agent))
+    def _set(self, agent: Agent) -> str:
+        self.db[agent.uuid] = json.dumps(to_dict(agent))
+        return agent.uuid
 
-    def set(self, agent_data: dict):
+    def set(self, agent_data: dict) -> str:
         agent = from_dict(agent_data)
-        self.db[agent.name] = json.dumps(agent_data)
+        self.db[agent.uuid] = json.dumps(agent_data)
+        return agent.uuid
 
-    def get(self, agent_name: str) -> Agent | None:
-        if agent_name in self.db:
-            return from_dict(json.loads(self.db[agent_name]))
+    def get(self, agent_uuid: str) -> Agent | None:
+        if agent_uuid in self.db:
+            return from_dict(json.loads(self.db[agent_uuid]))
 
         return None

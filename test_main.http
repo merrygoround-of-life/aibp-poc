@@ -6,77 +6,126 @@ Accept: application/json
 ###
 
 GET http://127.0.0.1:8000/test/debug_agent
+Accept: application/json
 
 ###
 
 POST http://127.0.0.1:8000/test/create_agent
 Content-Type: application/json
+Accept: application/json
 
 {
-  "name": "08597fcb-a9c9-4bfe-85c9-e93b18d54600",
+  "uuid": "d9208f07-8be6-4e9b-a539-67f175a29d64",
   "class": "ChainAgent",
   "config": {
     "class": "ChainConfig",
     "chain_map": [
+      [
+        {
+          "import_key": "asr_input"
+        }
+      ],
       [],
       [
         {
-          "from_key": "user",
-          "to_key": "user"
+          "import_key": "ip",
+          "to_key": "local_ip"
         },
         {
-          "from_key": "prompt",
-          "to_key": "prompt"
+          "import_key": "prompt"
+        }
+      ],
+      [
+        {
+          "import_key": "company"
+        },
+        {
+          "import_key": "response"
         }
       ]
     ]
   },
   "chain_agents": [
     {
-      "name": "0251c4ea-95ca-4693-8220-18af03e0361d",
+      "uuid": "3432080b-ef77-4e45-8239-b8953229c9f3",
+      "class": "AsrToPromptAgent",
+      "config": {
+        "class": "AgentConfig"
+      }
+    },
+    {
+      "uuid": "caec7197-d77c-4d9b-9d0d-7ff1e79d36b3",
       "class": "UserProfileAgent",
       "config": {
         "class": "AgentConfig"
       }
     },
     {
-      "name": "351d4d30-00e3-4d8f-aa11-23832e504a6a",
-      "class": "FunctionCallAgent",
+      "uuid": "2de63d07-21f5-4cf4-acdd-079f76eafca5",
+      "class": "RouterAgent",
       "config": {
         "class": "FunctionCallConfig",
+        "model": "gpt-3.5-turbo",
         "system_message": "You are a helpful assistant.",
-        "history_limit": 100
+        "history_limit": 200
       },
       "tool_agents": [
         {
-          "name": "9084d55f-c67c-4abc-b8d8-68d0fd856ca5",
-          "class": "LocationAgent",
+          "uuid": "a35e3f16-40a3-4c75-977c-19acd842f7cb",
+          "class": "AnimalInfoRouterAgent",
+          "config": {
+            "class": "FunctionCallConfig",
+            "model": "gpt-3.5-turbo",
+            "system_message": "You are an helpful assistant on animals.",
+            "history_limit": 100
+          },
+          "tool_agents": [
+            {
+              "uuid": "d68b53ab-4348-4124-832d-0249ba06e262",
+              "class": "CatFactsApiAgent",
+              "config": {
+                "class": "AgentConfig"
+              }
+            },
+            {
+              "uuid": "cd0256d2-472e-48b4-a164-c99f0393537c",
+              "class": "DogFactsApiAgent",
+              "config": {
+                "class": "AgentConfig"
+              }
+            }
+          ]
+        },
+        {
+          "uuid": "4b83f8d7-88a7-4448-aaa7-c1c2871a4d3c",
+          "class": "CurrentLocationAgent",
           "config": {
             "class": "AgentConfig"
           }
         },
         {
-          "name": "616c3010-26a1-4c76-9cf5-a28fdf9594db",
+          "uuid": "1f77f996-d54f-49eb-ab54-32a757665b4c",
           "class": "CurrentTimeAgent",
-          "config": {
-            "class": "AgentConfig"
-          }
-        },
-        {
-          "name": "eb9fe8c0-c5f5-4afb-b777-45bca6648652",
-          "class": "CatFactsAgent",
           "config": {
             "class": "AgentConfig"
           }
         }
       ]
+    },
+    {
+      "uuid": "662ad9de-c528-4f6f-a1ab-e24957facca8",
+      "class": "ResponseToAsrAgent",
+      "config": {
+        "class": "AgentConfig"
+      }
     }
   ]
 }
 
 ###
 
-POST http://127.0.0.1:8000/test/execute_agent/08597fcb-a9c9-4bfe-85c9-e93b18d54600
+POST http://127.0.0.1:8000/test/execute_agent/d9208f07-8be6-4e9b-a539-67f175a29d64
 Content-Type: application/json
+Accept: application/json
 
-{"prompt": "고양이에 대한 사실 3가지랑 현재 시각, 내가 있는 위치 알려줄래"}
+{"user": "isaac", "asr_input": {"text": "고양이에 대한 사실 3가지랑 현재 시각, 내가 있는 위치 알려줄래"}}

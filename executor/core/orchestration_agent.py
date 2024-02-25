@@ -8,11 +8,6 @@ from memory.manager import MemoryManager
 
 class OrchestrationAgentInput(AgentInput):
     prompt: str = Field(description="user prompt")
-    user: str = Field(description="user id")
-
-
-class OrchestrationConfig(AgentConfig):
-    system_message: str = Field(description="system message", default="You are a helpful assistant.")
 
 
 class OrchestrationAgent(Agent):
@@ -21,15 +16,14 @@ class OrchestrationAgent(Agent):
 
     memory_manager = MemoryManager()
 
-    def __init__(self, tool_agents: list[Agent]=[], config=OrchestrationConfig(), name: str = None):
-        super().__init__(config=config, name=name)
-        self.tool_agents: list[Agent] = tool_agents
+    def __init__(self, config: AgentConfig, tool_agents=None, uuid=None):
+        super().__init__(config=config, uuid=uuid)
+        self.tool_agents: list[Agent] = tool_agents if tool_agents else []
         self.tool_schemas: list[dict] = [tool_agent.tool_schema() for tool_agent in self.tool_agents]
-        self.system_message = OrchestrationConfig.parse_obj(config).system_message
-
-    def parameters_schema(self) -> dict:
-        return OrchestrationAgentInput.schema()
 
     @abstractmethod
-    def execute(self, agent_input: dict) -> dict:
+    def reason(self, messages):
         pass
+
+    def get_additional_messages(self, agent_input: dict) -> list:
+        return []
