@@ -1,8 +1,11 @@
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 from enum import Enum
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from openai.types.chat import ChatCompletionToolParam
+from openai.types.shared_params import FunctionDefinition
+from pydantic import BaseModel
 
 
 class AgentType(int, Enum):
@@ -18,14 +21,6 @@ class AgentInput(BaseModel):
     pass
 
 
-class AgentChain(BaseModel):
-    """
-    Model for Agent AgentChain
-    """
-    from_key: str = Field(description="previous output key name to transfer from")
-    to_key: str = Field(description="current input key name to transfer to")
-
-
 class AgentConfig(BaseModel):
     """
     Model for Agent Config
@@ -37,23 +32,34 @@ class Agent(metaclass=ABCMeta):
     type: AgentType = AgentType.TOOL
     description: str
 
-    def __init__(self, config: AgentConfig, name: str = None):
-        self.name: str = name if name else str(uuid4())
+    def __init__(self, config: AgentConfig, uuid=None):
+        self.uuid: str = uuid if uuid else str(uuid4())
         self.config: AgentConfig = config
 
     def tool_schema(self) -> dict:
-        return {
-            "type": "function",
-            "function": {
-                "name": self.name,
-                "description": self.description,
-                "parameters": self.parameters_schema()
-            }
-        }
+        return ChatCompletionToolParam(
+            type="function",
+            function=FunctionDefinition(
+                name=self.uuid,
+                description=self.description,
+                parameters=self.parameters_schema()
+            )
+        )
 
     def parameters_schema(self) -> dict:
         return AgentInput.schema()
 
+    def execute(self, user: str, agent_input: dict) -> dict:
+        print(f"[{self.__class__.__name__}] invoking")
+        start = datetime.now()
+
+        output = self.invoke(user, agent_input)
+
+        end = datetime.now()
+        print(f"[{self.__class__.__name__}] invoked ({format((end - start).total_seconds() * 1000, '.3f')} ms)")
+
+        return output
+
     @abstractmethod
-    def execute(self, agent_input: dict) -> dict:
+    def invoke(self, user: str, agent_input: dict) -> dict:
         pass

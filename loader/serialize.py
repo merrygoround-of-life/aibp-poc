@@ -19,11 +19,11 @@ def to_tool_dict(agent: OrchestrationAgent):
 
 def to_dict(agent: Agent):
     agent_dict = {
-        "name": agent.name,
+        "uuid": agent.uuid,
         "class": agent.__class__.__name__,
         "config": {
             **{"class": agent.config.__class__.__name__},
-            **agent.config.dict()
+            **agent.config.model_dump(exclude_none=True)
         }
     }
 
