@@ -24,7 +24,7 @@ class AsrInput(BaseModel):
     text: str = Field(description="textual input value")
 
 
-class AibpInput(BaseModel):
+class AiEgnInput(BaseModel):
     user: str = Field(description="user id")
     asr_input: AsrInput = Field(description="asr input value")
 
@@ -34,28 +34,28 @@ class AsrOutput(BaseModel):
     company: str = Field(description="user company")
 
 
-class AibpOutput(BaseModel):
+class AiEgnOutput(BaseModel):
     asr_output: AsrOutput = Field(description="asr output value")
 
 
 # Agent Executor
 @app.post("/test/execute_agent/{uuid}")
-def test_execute_agent(uuid: str, aibp_input: AibpInput):
+def test_execute_agent(uuid: str, ai_egn_input: AiEgnInput):
     loaded_agent = agent_manager.get(uuid)
     if not loaded_agent:
         raise HTTPException(status_code=404, detail="Agent not found by uuid")
 
     print(f"=== Agent({uuid}) executing ===")
     start = datetime.now()
-    aibp_output = AibpOutput.model_validate(loaded_agent.execute(
-        user=aibp_input.user, agent_input={
-            "asr_input": aibp_input.asr_input.model_dump()
+    ai_egn_output = AiEgnOutput.model_validate(loaded_agent.execute(
+        user=ai_egn_input.user, agent_input={
+            "asr_input": ai_egn_input.asr_input.model_dump()
         })
     )
 
     end = datetime.now()
     print(f"=== Agent({uuid}) executed (elapsed: {format((end - start).total_seconds(), '.3f')} s) ===")
-    return aibp_output
+    return ai_egn_output
 
 
 # Agent Builder Mock
@@ -100,12 +100,12 @@ def test_debug_agent():
     print(serialized)
 
     uuid = test_create_agent(agent_dict)["uuid"]
-    aibp_output = test_execute_agent(
+    ai_egn_output = test_execute_agent(
         uuid=uuid,
-        aibp_input=AibpInput(
+        ai_egn_input=AiEgnInput(
             user="isaac",
             asr_input=AsrInput(text="고양이에 대한 사실 3가지랑 현재 시각, 내가 있는 위치 알려줄래")
         )
     )
 
-    return aibp_output
+    return ai_egn_output
