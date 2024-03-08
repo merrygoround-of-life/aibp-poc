@@ -1,4 +1,4 @@
-# aibp-poc
+# ai-egn-poc
 
 
 ## Quickstart
