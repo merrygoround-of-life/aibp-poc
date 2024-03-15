@@ -10,6 +10,20 @@ Accept: application/json
 
 ###
 
+POST http://127.0.0.1:8000/test/setup_vectorstore
+Content-Type: application/json
+Accept: application/json
+
+[
+  "Harry Potter is a man born in 1980.",
+  "Ron Weasley is a man born in 1982.",
+  "Hermione Granger is a woman born in 2012.",
+  "Albus Dumbledore is a man born in 2014.",
+  "Rubeus Hagrid is a man born in 2017."
+]
+
+###
+
 POST http://127.0.0.1:8000/test/create_agent
 Content-Type: application/json
 Accept: application/json
@@ -109,6 +123,44 @@ Accept: application/json
           "config": {
             "class": "AgentConfig"
           }
+        },
+        {
+          "uuid": "40ad96d8-c871-4daa-9e4d-a75a96a11c20",
+          "class": "RetrievalAgent",
+          "config": {
+            "class": "ChainConfig",
+            "chain_map": [
+              [
+                {
+                  "import_key": "prompts",
+                  "to_key": "texts"
+                }
+              ],
+              [
+                {
+                  "import_key": "embeddings",
+                  "to_key": "vectors"
+                }
+              ]
+            ]
+          },
+          "chain_agents": [
+            {
+              "uuid": "970e9f69-2eec-4cd3-a4ed-658f9bc49732",
+              "class": "EmbeddingAgent",
+              "config": {
+                "class": "EmbeddingConfig",
+                "model": "text-embedding-3-small"
+              }
+            },
+            {
+              "uuid": "270445cd-8c60-4bf5-93b5-51e6bc4e1f84",
+              "class": "VectorQueryAgent",
+              "config": {
+                "class": "AgentConfig"
+              }
+            }
+          ]
         }
       ]
     },
@@ -128,4 +180,9 @@ POST http://127.0.0.1:8000/test/execute_agent/d9208f07-8be6-4e9b-a539-67f175a29d
 Content-Type: application/json
 Accept: application/json
 
-{"user": "isaac", "asr_input": {"text": "고양이에 대한 사실 3가지랑 현재 시각, 내가 있는 위치 알려줄래"}}
+{
+  "user": "isaac",
+  "asr_input": {
+    "text": "고양이에 대한 사실 3가지랑 현재 시각, 내가 있는 위치 그리고 내 가족 중에서 Hermione와 Hagrid에 대해 알려줄래"
+  }
+}

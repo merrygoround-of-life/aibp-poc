@@ -1,5 +1,4 @@
 import requests
-
 from pydantic import Field
 
 from executor.core.agent import Agent, AgentConfig, AgentInput

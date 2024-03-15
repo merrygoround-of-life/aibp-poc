@@ -27,17 +27,18 @@ class FunctionCallAgent(OrchestrationAgent):
 
     def invoke(self, user: str, agent_input: dict) -> dict:
         orchestration_input = OrchestrationAgentInput.model_validate(agent_input)
-        messages = []
+
+        messages = [ChatCompletionSystemMessageParam(
+            role="system",
+            content=self.__system_message
+        )]
 
         memory = OrchestrationAgent.memory_manager.get_memory(self.uuid, user)
         history = memory.get(self.__limit)
-        if not history:
-            messages.append(ChatCompletionSystemMessageParam(
-                role="system",
-                content=self.__system_message
-            ))
-            for message in self.get_additional_messages(agent_input):
-                messages.append(message)
+        messages.extend(history)
+
+        for message in self.get_additional_messages(agent_input):
+            messages.append(message)
 
         messages.append(ChatCompletionUserMessageParam(
             role="user",
@@ -46,7 +47,7 @@ class FunctionCallAgent(OrchestrationAgent):
 
         reason_stop = False
         while not reason_stop:
-            stream_completion = self.reason(messages=history + messages)
+            stream_completion = self.reason(messages=messages)
 
             choice_full = None
             for chunk_completion in stream_completion:
