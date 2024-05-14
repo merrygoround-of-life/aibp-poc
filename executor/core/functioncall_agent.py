@@ -101,7 +101,7 @@ def _merge_choice_delta(full: ChoiceDelta, delta: ChoiceDelta):
             if index >= len(tc_fulls):
                 tc_fulls.append(tc_delta)   # assume that the indexes appear in order.
             if tc_delta.id:
-                tc_fulls[index].id = tc_fulls[index].id + tc_delta.id if tc_fulls[index].id else tc_delta.id
+                tc_fulls[index].id = tc_delta.id
             if tc_delta.type:
                 tc_fulls[index].type = tc_delta.type
             if tc_delta.function:
